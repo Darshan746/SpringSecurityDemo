@@ -1,0 +1,55 @@
+
+
+When we mentioning the antMatchers() in config , order matters.
+
+In oder to enable method level security, we have to add the annotation on the config class
+@EnableGlobalMethodSecurity(prePostEnabled = true)
+
+
+ @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_ADMINTRAINEE')")
+ @PreAuthorize("hasRole('ROLE_ADMIN')")
+ @PreAuthorize("hasAuthority('course:read')")
+ @PreAuthorize("hasAnyAuthority('course:read','course:write')")
+
+
+
+ CSRF - Cross site Request Forgery
+ ===
+ Hacker forges a request for a fund transfer to a website
+ Hacker embedded the request into a hyperlink and send it to the visitor who may be logged into the site
+ If a visitor(Logged in user)  click on the link, inadvertently sending the request to the website.
+ Website validates the request and transfer fund from the visitor's account to the Hacker account.
+
+
+ How CSRF Works
+ --------------
+     1] When the client(Frontend) logged into the Server
+     2] Spring Security from Server will send CSRF token into cookies
+     3] Then the client(front end) uses that CSRF token for Any form Submission (POST/PUT/DELETE request)
+     4] after the form submission , server will validate the csrf token which was sent earlier into cookie to client app
+     5] When CSRF is enabled in the application, hackers would not get the csrf token which was sent by the Server.
+
+
+
+     When to use CSRF in the application
+     -----------------------------------
+        Use CSRF protection for any request that could be processed by the browser by the normal user.
+
+        If you are  creating a service which is using by non browser client like postman then you will likely want to disable the csrf protection.
+
+
+
+
+ BASIC Authentication (basic auth)
+ --------------------
+
+  HTTPS is recommended
+  Simple and Fast
+  Can't logout
+
+
+
+
+
+
+
