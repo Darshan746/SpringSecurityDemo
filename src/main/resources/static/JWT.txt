@@ -1,0 +1,30 @@
+
+pros
+=====
+JWT is a fast, stateless, used across many services.
+
+cons
+====
+No visibality to logged in user
+compromised secretkey
+token can be stolen
+
+
+The diagram `jwt.png` depicts the working nature of JWD
+
+By Seeing the jwt.img we can explain as below
+
+    1] first client will send credentials to the server
+    2] Server will validate the Credentials and `Create` and `Signs` the token
+    3] Send token  back to the client
+    4] In the subsequent request client can send only token to the server
+
+
+
+
+ JWT token has 3 parts
+    1st one will indicates the Algorithm and token type
+    2nd one indicates that payload data
+    3rd one indicates the signature
+
+   Note->  all these parts will be separated by dot(.)

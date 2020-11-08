@@ -22,8 +22,15 @@ public class FakeApplicationDaoService implements  ApplicationUserDAO {
 
     @Override
     public Optional<ApplicationUser> selectApplicationUserByUserName(String userName) {
-        return getApplicationUser().stream().filter(applicationUser -> applicationUser.getUsername().equals(userName))
-                .findFirst();
+        return getApplicationUser().stream().filter(applicationUser -> applicationUser.getUsername().equals(userName)).findFirst();
+
+//        for(ApplicationUser applicationUser: getApplicationUser()){
+//            if(applicationUser.getUsername().equals(userName)){
+//                return Optional.ofNullable(applicationUser);
+//            }
+//        }
+//        return Optional.empty();
+//    }
     }
 
     private List<ApplicationUser> getApplicationUser() {
@@ -34,21 +41,22 @@ public class FakeApplicationDaoService implements  ApplicationUserDAO {
                         , true
                         , true
                         , true
-                        , true),
+                        , true
+               ,true),
                 new ApplicationUser(ApplicationUserRole.ADMIN.getGrantedAuthorities()
                         , passwordEncoder.encode("password")
                         , "Krishna"
                         , true
                         , true
                         , true
-                        , true)
+                        , true,true)
                 , new ApplicationUser(ApplicationUserRole.ADMINTRAINEE.getGrantedAuthorities()
                         , passwordEncoder.encode("password")
                         , "LINDA"
                         , true
                         , true
                         , true
-                        , true));
+                        , true,true));
     }
 }
 

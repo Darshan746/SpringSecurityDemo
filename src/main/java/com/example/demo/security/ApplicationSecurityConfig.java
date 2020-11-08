@@ -1,25 +1,36 @@
 package com.example.demo.security;
 
+import com.example.demo.auth.ApplicationUserService;
+import com.example.demo.jwt.JwtTokenVerifier;
+import com.example.demo.jwt.JwtUserNameAndPasswordAuthenticationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ApplicationUserService applicationUserService;
 
     @Autowired
     ApplicationSecurityConfig(PasswordEncoder passwordEncoder){
@@ -28,7 +39,12 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http
+
+
+
+        //For Form based and Role based Authentication
+
+       /* http
                 .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/","/css","/js").permitAll()  //antMatchers -> It will not apply security to the mentioned URL //permitAll-> Tells that dont apply the security to the above mentioned URL.
@@ -49,10 +65,28 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
                 .clearAuthentication(true)
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID", "remember-me")
-                .logoutSuccessUrl("/login");
+                .logoutSuccessUrl("/login");*/
+
+
+     //  NOTE  // for JWT token Authentication
+
+        http.
+                csrf().disable()
+                .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
+                .addFilter(new JwtUserNameAndPasswordAuthenticationFilter(authenticationManager()))
+                .addFilterAfter(new JwtTokenVerifier(),JwtUserNameAndPasswordAuthenticationFilter.class)
+                .authorizeRequests()
+                .antMatchers("/","/index", "/css/*","js/*").permitAll()
+                .anyRequest().authenticated();
     }
 
-    @Override
+
+    /**
+     * Commented this code because we have implemented our own UserDetail Service in Service Layer
+     */
+   /* @Override
     @Bean
     protected UserDetailsService userDetailsService() {
         UserDetails userDetailsServiceRama =  User.builder()
@@ -84,5 +118,19 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
 
     public static void main(String[] args) {
 
+    }*/
+
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception{
+        authenticationManagerBuilder.authenticationProvider(daoAuthenticationProvider());
+}
+
+    @Bean
+    public DaoAuthenticationProvider daoAuthenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setPasswordEncoder(passwordEncoder);
+        provider.setUserDetailsService(applicationUserService);
+        return provider;
     }
 }
